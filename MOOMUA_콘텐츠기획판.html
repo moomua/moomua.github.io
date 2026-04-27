@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MOOMUA 기획판">
+<title>MOOMUA — 콘텐츠 기획판</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue: #4A6FA5; --blue-light: #E6F1FB; --blue-mid: #2C5282; --blue-dark: #1C2B3A;
+  --cream: #F7F3EE; --beige: #EDE8E1; --warm: #E8DDD0;
+  --text: #1A1918; --text2: #5C5A55; --text3: #9C9A93;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.13);
+  --white: #FFFFFF; --r: 12px; --r-sm: 8px;
+  --body:    #E6F1FB; --body-t:    #185FA5;
+  --face:    #FBEAF0; --face-t:    #8B2A4A;
+  --health:  #E1F5EE; --health-t:  #0B5E42;
+  --routine: #FAEEDA; --routine-t: #7A4A0A;
+  --life:    #EAF3DE; --life-t:    #375E0E;
+  --s-idea-bg:#F0EFEC; --s-idea-t:#5C5A55;
+  --s-plan-bg:#E6F1FB; --s-plan-t:#185FA5;
+  --s-making-bg:#FAEEDA; --s-making-t:#7A4A0A;
+  --s-done-bg:#E1F5EE; --s-done-t:#0B5E42;
+  --s-posted-bg:#1C2B3A; --s-posted-t:#F0EDE8;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--cream); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(247,243,238,0.96); backdrop-filter: blur(14px);
+  border-bottom: 0.5px solid var(--border2);
+  padding: 0 1.5rem; height: 52px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.tb-brand { font-family: 'Noto Serif KR', serif; font-size: 13px; letter-spacing: 0.16em; color: var(--blue-mid); white-space: nowrap; }
+.tb-right { display: flex; gap: 8px; align-items: center; }
+.tb-count { font-size: 12px; color: var(--text3); }
+.tb-btn { font-size: 12px; padding: 6px 14px; border-radius: 99px; border: none; cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.15s; white-space: nowrap; }
+.tb-btn-primary { background: var(--blue); color: var(--white); }
+.tb-btn-primary:hover { background: var(--blue-mid); }
+.tb-btn-ghost { background: transparent; color: var(--text2); border: 0.5px solid var(--border2); }
+.tb-btn-ghost:hover { background: var(--beige); }
+
+.layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 52px); }
+
+.sidebar { background: var(--beige); border-right: 0.5px solid var(--border2); padding: 1.5rem 1rem; position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto; }
+.sb-section { margin-bottom: 1.5rem; }
+.sb-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin-bottom: 0.6rem; padding: 0 6px; }
+.sb-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: var(--r-sm); font-size: 13px; color: var(--text2); cursor: pointer; transition: all 0.12s; border: none; background: none; font-family: inherit; width: 100%; text-align: left; }
+.sb-item:hover { background: var(--warm); color: var(--text); }
+.sb-item.active { background: var(--blue); color: var(--white); font-weight: 500; }
+.sb-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.sb-cnt { margin-left: auto; font-size: 10px; opacity: 0.6; }
+.sb-stat { background: var(--white); border-radius: var(--r-sm); padding: 10px 12px; margin-bottom: 8px; border: 0.5px solid var(--border); }
+.ss-num { font-size: 20px; font-weight: 500; color: var(--text); }
+.ss-label { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+.main { padding: 1.5rem; overflow-y: auto; }
+
+.quick-add { background: var(--white); border: 0.5px solid var(--border2); border-radius: var(--r); padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.qa-title { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 0.85rem; }
+.qa-grid { display: grid; grid-template-columns: 1fr auto auto auto; gap: 8px; align-items: end; }
+.qa-input-wrap { display: flex; flex-direction: column; gap: 4px; }
+.qa-label { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+.qa-input, .qa-select { font-size: 13px; padding: 8px 12px; border: 0.5px solid var(--border2); border-radius: var(--r-sm); background: var(--cream); color: var(--text); font-family: inherit; outline: none; transition: border-color 0.15s; }
+.qa-input:focus, .qa-select:focus { border-color: var(--blue); background: var(--white); }
+.qa-input { min-width: 0; }
+
+.filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+.filter-label { font-size: 11px; color: var(--text3); margin-right: 2px; }
+.f-chip { font-size: 11px; padding: 4px 11px; border-radius: 99px; border: 0.5px solid var(--border2); cursor: pointer; color: var(--text2); background: var(--white); font-family: inherit; transition: all 0.12s; }
+.f-chip:hover { border-color: var(--blue); color: var(--blue); }
+.f-chip.on { background: var(--blue); color: var(--white); border-color: var(--blue); }
+
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+
+.idea-card { background: var(--white); border: 0.5px solid var(--border); border-radius: var(--r); overflow: hidden; transition: box-shadow 0.15s, border-color 0.15s; cursor: pointer; display: flex; flex-direction: column; }
+.idea-card:hover { border-color: var(--border2); box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+.card-top { padding: 1rem 1rem 0.75rem; flex: 1; }
+.card-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 0.6rem; }
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; border: 0.5px solid transparent; white-space: nowrap; }
+.badge-body    { background: var(--body);    color: var(--body-t);    border-color: var(--body-t); }
+.badge-face    { background: var(--face);    color: var(--face-t);    border-color: var(--face-t); }
+.badge-health  { background: var(--health);  color: var(--health-t);  border-color: var(--health-t); }
+.badge-routine { background: var(--routine); color: var(--routine-t); border-color: var(--routine-t); }
+.badge-life    { background: var(--life);    color: var(--life-t);    border-color: var(--life-t); }
+.badge-format  { background: var(--beige);   color: var(--text2);     border-color: var(--border2); }
+.card-title { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.45; margin-bottom: 6px; }
+.card-hook { font-size: 12px; color: var(--text2); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-memo { font-size: 11px; color: var(--text3); margin-top: 6px; font-style: italic; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.card-bottom { padding: 8px 1rem; border-top: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--cream); }
+.card-date { font-size: 10px; color: var(--text3); }
+.card-status { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+.s-idea    { background: var(--s-idea-bg);    color: var(--s-idea-t); }
+.s-plan    { background: var(--s-plan-bg);    color: var(--s-plan-t); }
+.s-making  { background: var(--s-making-bg);  color: var(--s-making-t); }
+.s-done    { background: var(--s-done-bg);    color: var(--s-done-t); }
+.s-posted  { background: var(--s-posted-bg);  color: var(--s-posted-t); }
+.card-actions { display: flex; gap: 4px; }
+.card-btn { font-size: 10px; padding: 2px 7px; border-radius: var(--r-sm); border: 0.5px solid var(--border2); background: var(--white); color: var(--text2); cursor: pointer; font-family: inherit; transition: all 0.12s; }
+.card-btn:hover { background: var(--beige); }
+.card-btn.del:hover { background: #FCEAEA; color: #A32D2D; border-color: #F09595; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1rem; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--white); border-radius: var(--r); width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.modal-header { padding: 1.25rem 1.5rem 1rem; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--white); z-index: 1; }
+.modal-header-title { font-size: 14px; font-weight: 500; }
+.modal-close { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--beige); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text2); transition: background 0.12s; }
+.modal-close:hover { background: var(--warm); }
+.modal-body { padding: 1.25rem 1.5rem; }
+.modal-field { margin-bottom: 1rem; }
+.mf-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; }
+.mf-input, .mf-select, .mf-textarea { width: 100%; font-size: 13px; padding: 9px 12px; border: 0.5px solid var(--border2); border-radius: var(--r-sm); background: var(--cream); color: var(--text); font-family: inherit; outline: none; transition: border-color 0.15s; resize: vertical; }
+.mf-input:focus, .mf-select:focus, .mf-textarea:focus { border-color: var(--blue); background: var(--white); }
+.mf-textarea { min-height: 80px; }
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-actions { padding: 1rem 1.5rem; border-top: 0.5px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.modal-btn { font-size: 13px; padding: 8px 18px; border-radius: 99px; border: none; cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.15s; }
+.modal-btn-primary { background: var(--blue); color: var(--white); }
+.modal-btn-primary:hover { background: var(--blue-mid); }
+.modal-btn-ghost { background: var(--beige); color: var(--text2); }
+.modal-btn-ghost:hover { background: var(--warm); }
+
+.empty-state { text-align: center; padding: 4rem 2rem; color: var(--text3); }
+.empty-icon { font-size: 36px; margin-bottom: 1rem; }
+.empty-title { font-size: 15px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+.empty-desc { font-size: 13px; line-height: 1.7; }
+
+@media (max-width: 640px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .qa-grid { grid-template-columns: 1fr; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .topbar { padding: 0 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-brand">MOOMUA · 콘텐츠 기획판</div>
+  <div class="tb-right">
+    <span class="tb-count" id="total-count">0개</span>
+    <button class="tb-btn tb-btn-ghost" onclick="exportData()">내보내기</button>
+    <button class="tb-btn tb-btn-primary" onclick="openModal()">+ 아이디어 추가</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">현황</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;">
+        <div class="sb-stat"><div class="ss-num" id="stat-total">0</div><div class="ss-label">전체</div></div>
+        <div class="sb-stat"><div class="ss-num" id="stat-posted">0</div><div class="ss-label">게시완료</div></div>
+        <div class="sb-stat"><div class="ss-num" id="stat-inprogress">0</div><div class="ss-label">진행중</div></div>
+        <div class="sb-stat"><div class="ss-num" id="stat-idea">0</div><div class="ss-label">아이디어</div></div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">상태별</div>
+      <button class="sb-item active" onclick="filterStatus('all',this)"><span>📋</span> 전체 보기 <span class="sb-cnt" id="cnt-all">0</span></button>
+      <button class="sb-item" onclick="filterStatus('idea',this)"><div class="sb-dot" style="background:#9C9A93;"></div> 아이디어 <span class="sb-cnt" id="cnt-idea">0</span></button>
+      <button class="sb-item" onclick="filterStatus('plan',this)"><div class="sb-dot" style="background:#185FA5;"></div> 기획중 <span class="sb-cnt" id="cnt-plan">0</span></button>
+      <button class="sb-item" onclick="filterStatus('making',this)"><div class="sb-dot" style="background:#7A4A0A;"></div> 제작중 <span class="sb-cnt" id="cnt-making">0</span></button>
+      <button class="sb-item" onclick="filterStatus('done',this)"><div class="sb-dot" style="background:#0B5E42;"></div> 완성 <span class="sb-cnt" id="cnt-done">0</span></button>
+      <button class="sb-item" onclick="filterStatus('posted',this)"><div class="sb-dot" style="background:#1C2B3A;"></div> 게시완료 <span class="sb-cnt" id="cnt-posted">0</span></button>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">카테고리별</div>
+      <button class="sb-item" onclick="filterCat('body',this)"><div class="sb-dot" style="background:#185FA5;"></div> 바디 디자인 <span class="sb-cnt" id="cnt-body">0</span></button>
+      <button class="sb-item" onclick="filterCat('face',this)"><div class="sb-dot" style="background:#8B2A4A;"></div> 페이스 케어 <span class="sb-cnt" id="cnt-face">0</span></button>
+      <button class="sb-item" onclick="filterCat('health',this)"><div class="sb-dot" style="background:#0B5E42;"></div> 여성 건강 <span class="sb-cnt" id="cnt-health">0</span></button>
+      <button class="sb-item" onclick="filterCat('routine',this)"><div class="sb-dot" style="background:#7A4A0A;"></div> 건강 루틴 <span class="sb-cnt" id="cnt-routine">0</span></button>
+      <button class="sb-item" onclick="filterCat('life',this)"><div class="sb-dot" style="background:#375E0E;"></div> MOOMUA 라이프 <span class="sb-cnt" id="cnt-life">0</span></button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="quick-add">
+      <div class="qa-title">⚡ 빠른 아이디어 메모</div>
+      <div class="qa-grid">
+        <div class="qa-input-wrap" style="grid-column:1/-1;">
+          <input class="qa-input" id="quick-title" placeholder="아이디어 제목 or 훅 문구를 빠르게 적어두세요..." onkeydown="if(event.key==='Enter')quickAdd()">
+        </div>
+        <div class="qa-input-wrap">
+          <div class="qa-label">카테고리</div>
+          <select class="qa-select" id="quick-cat">
+            <option value="body">바디 디자인</option>
+            <option value="face">페이스 케어</option>
+            <option value="health">여성 건강</option>
+            <option value="routine">건강 루틴</option>
+            <option value="life">MOOMUA 라이프</option>
+          </select>
+        </div>
+        <div class="qa-input-wrap">
+          <div class="qa-label">포맷</div>
+          <select class="qa-select" id="quick-format">
+            <option value="카드뉴스">카드뉴스</option>
+            <option value="릴스">릴스</option>
+            <option value="카드+릴스">카드+릴스</option>
+            <option value="스토리">스토리</option>
+            <option value="유튜브">유튜브</option>
+          </select>
+        </div>
+        <button class="tb-btn tb-btn-primary" style="height:36px;align-self:end;" onclick="quickAdd()">저장</button>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <span class="filter-label">포맷</span>
+      <button class="f-chip on" onclick="toggleFormat('all',this)">전체</button>
+      <button class="f-chip" onclick="toggleFormat('카드뉴스',this)">카드뉴스</button>
+      <button class="f-chip" onclick="toggleFormat('릴스',this)">릴스</button>
+      <button class="f-chip" onclick="toggleFormat('카드+릴스',this)">카드+릴스</button>
+      <button class="f-chip" onclick="toggleFormat('스토리',this)">스토리</button>
+      <button class="f-chip" onclick="toggleFormat('유튜브',this)">유튜브</button>
+    </div>
+
+    <div class="cards-grid" id="cards-container">
+      <div class="empty-state" id="empty-state" style="grid-column:1/-1;">
+        <div class="empty-icon">🌿</div>
+        <div class="empty-title">아직 아이디어가 없어요</div>
+        <div class="empty-desc">위에서 빠르게 메모하거나<br>"+ 아이디어 추가"로 상세하게 기획해보세요 🩶</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-header-title" id="modal-title-label">아이디어 추가</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="modal-id">
+      <div class="modal-field">
+        <div class="mf-label">콘텐츠 제목 / 훅 문구 *</div>
+        <input class="mf-input" id="m-title" placeholder="예: 리프팅 시술 전에, 두피 긴장부터 확인해보세요">
+      </div>
+      <div class="modal-grid">
+        <div class="modal-field">
+          <div class="mf-label">카테고리</div>
+          <select class="mf-select" id="m-cat">
+            <option value="body">바디 디자인</option>
+            <option value="face">페이스 케어</option>
+            <option value="health">여성 건강</option>
+            <option value="routine">건강 루틴</option>
+            <option value="life">MOOMUA 라이프</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <div class="mf-label">포맷</div>
+          <select class="mf-select" id="m-format">
+            <option value="카드뉴스">카드뉴스</option>
+            <option value="릴스">릴스</option>
+            <option value="카드+릴스">카드+릴스</option>
+            <option value="스토리">스토리</option>
+            <option value="유튜브">유튜브</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field">
+        <div class="mf-label">핵심 메시지</div>
+        <textarea class="mf-textarea" id="m-message" placeholder="이 콘텐츠로 전달하고 싶은 핵심 메시지"></textarea>
+      </div>
+      <div class="modal-field">
+        <div class="mf-label">슬라이드 / 영상 구성 메모</div>
+        <textarea class="mf-textarea" id="m-structure" placeholder="슬라이드 1: 훅&#10;슬라이드 2~4: 본문&#10;슬라이드 5: CTA"></textarea>
+      </div>
+      <div class="modal-field">
+        <div class="mf-label">캡션 아이디어</div>
+        <textarea class="mf-textarea" id="m-caption" style="min-height:60px;" placeholder="캡션 첫 문장이나 키워드 메모"></textarea>
+      </div>
+      <div class="modal-field">
+        <div class="mf-label">촬영 / 제작 메모</div>
+        <textarea class="mf-textarea" id="m-shoot" style="min-height:60px;" placeholder="촬영 장소, 소품, 배경음악 아이디어 등"></textarea>
+      </div>
+      <div class="modal-grid">
+        <div class="modal-field">
+          <div class="mf-label">상태</div>
+          <select class="mf-select" id="m-status">
+            <option value="idea">아이디어</option>
+            <option value="plan">기획중</option>
+            <option value="making">제작중</option>
+            <option value="done">완성</option>
+            <option value="posted">게시완료</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <div class="mf-label">목표 발행일</div>
+          <input class="mf-input" type="date" id="m-date">
+        </div>
+      </div>
+      <div class="modal-field">
+        <div class="mf-label">기타 메모</div>
+        <textarea class="mf-textarea" id="m-memo" style="min-height:50px;" placeholder="레퍼런스 계정, 참고 자료 등"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-ghost" onclick="closeModal()">취소</button>
+      <button class="modal-btn modal-btn-primary" onclick="saveCard()">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'moomua_ideas_v2';
+function load() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; } }
+function save(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {} }
+
+let ideas = load();
+let filterSt = 'all', filterCatVal = null, filterFmt = 'all', editingId = null;
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function today() { return new Date().toISOString().slice(0,10); }
+function fmtDate(d) { if(!d) return ''; const [y,m,dd] = d.split('-'); return `${m}/${dd}`; }
+
+const CAT_LABEL = { body:'바디 디자인', face:'페이스 케어', health:'여성 건강', routine:'건강 루틴', life:'MOOMUA 라이프' };
+const STATUS_LABEL = { idea:'아이디어', plan:'기획중', making:'제작중', done:'완성', posted:'게시완료' };
+
+function render() {
+  let filtered = ideas.slice();
+  if (filterSt !== 'all') filtered = filtered.filter(i => i.status === filterSt);
+  if (filterCatVal) filtered = filtered.filter(i => i.cat === filterCatVal);
+  if (filterFmt !== 'all') filtered = filtered.filter(i => i.format === filterFmt);
+  const container = document.getElementById('cards-container');
+  const empty = document.getElementById('empty-state');
+  container.querySelectorAll('.idea-card').forEach(e => e.remove());
+  if (filtered.length === 0) { empty.style.display = 'block'; }
+  else { empty.style.display = 'none'; filtered.slice().reverse().forEach(idea => container.appendChild(makeCard(idea))); }
+  updateCounts();
+}
+
+function makeCard(idea) {
+  const div = document.createElement('div');
+  div.className = 'idea-card';
+  div.innerHTML = `
+    <div class="card-top" onclick="openModal('${idea.id}')">
+      <div class="card-badges">
+        <span class="badge badge-${idea.cat}">${CAT_LABEL[idea.cat]}</span>
+        <span class="badge badge-format">${idea.format}</span>
+      </div>
+      <div class="card-title">${escHtml(idea.title)}</div>
+      ${idea.message ? `<div class="card-hook">${escHtml(idea.message)}</div>` : ''}
+      ${idea.memo ? `<div class="card-memo">${escHtml(idea.memo)}</div>` : ''}
+    </div>
+    <div class="card-bottom">
+      <span class="card-date">${idea.date ? fmtDate(idea.date) : today().slice(5).replace('-','/')}</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span class="card-status s-${idea.status}">${STATUS_LABEL[idea.status]}</span>
+        <div class="card-actions">
+          <button class="card-btn" onclick="event.stopPropagation();cycleStatus('${idea.id}')">→</button>
+          <button class="card-btn del" onclick="event.stopPropagation();deleteCard('${idea.id}')">✕</button>
+        </div>
+      </div>
+    </div>`;
+  return div;
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function updateCounts() {
+  const total = ideas.length;
+  document.getElementById('total-count').textContent = total + '개';
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-posted').textContent = ideas.filter(i=>i.status==='posted').length;
+  document.getElementById('stat-inprogress').textContent = ideas.filter(i=>['plan','making'].includes(i.status)).length;
+  document.getElementById('stat-idea').textContent = ideas.filter(i=>i.status==='idea').length;
+  ['all','idea','plan','making','done','posted'].forEach(s => {
+    const el = document.getElementById('cnt-'+s);
+    if (el) el.textContent = s === 'all' ? ideas.length : ideas.filter(i=>i.status===s).length;
+  });
+  ['body','face','health','routine','life'].forEach(c => {
+    const el = document.getElementById('cnt-'+c);
+    if (el) el.textContent = ideas.filter(i=>i.cat===c).length;
+  });
+}
+
+function filterStatus(st, btn) {
+  filterSt = st; filterCatVal = null;
+  document.querySelectorAll('.sidebar .sb-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); render();
+}
+function filterCat(cat, btn) {
+  filterCatVal = filterCatVal === cat ? null : cat; filterSt = 'all';
+  document.querySelectorAll('.sidebar .sb-item').forEach(b => b.classList.remove('active'));
+  if (filterCatVal) btn.classList.add('active'); render();
+}
+function toggleFormat(fmt, btn) {
+  filterFmt = fmt;
+  document.querySelectorAll('.filter-bar .f-chip').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); render();
+}
+
+function quickAdd() {
+  const title = document.getElementById('quick-title').value.trim();
+  if (!title) return;
+  ideas.push({ id:uid(), title, cat:document.getElementById('quick-cat').value, format:document.getElementById('quick-format').value, status:'idea', date:today(), message:'', structure:'', caption:'', shoot:'', memo:'' });
+  save(ideas);
+  document.getElementById('quick-title').value = '';
+  render();
+}
+
+function openModal(id) {
+  editingId = id || null;
+  document.getElementById('modal-title-label').textContent = id ? '아이디어 수정' : '아이디어 추가';
+  if (id) {
+    const idea = ideas.find(i => i.id === id);
+    if (!idea) return;
+    document.getElementById('m-title').value = idea.title;
+    document.getElementById('m-cat').value = idea.cat;
+    document.getElementById('m-format').value = idea.format;
+    document.getElementById('m-message').value = idea.message || '';
+    document.getElementById('m-structure').value = idea.structure || '';
+    document.getElementById('m-caption').value = idea.caption || '';
+    document.getElementById('m-shoot').value = idea.shoot || '';
+    document.getElementById('m-status').value = idea.status;
+    document.getElementById('m-date').value = idea.date || '';
+    document.getElementById('m-memo').value = idea.memo || '';
+  } else {
+    ['m-title','m-message','m-structure','m-caption','m-shoot','m-memo'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('m-cat').value = 'body';
+    document.getElementById('m-format').value = '카드뉴스';
+    document.getElementById('m-status').value = 'idea';
+    document.getElementById('m-date').value = '';
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('m-title').focus(), 100);
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); editingId = null; }
+
+function saveCard() {
+  const title = document.getElementById('m-title').value.trim();
+  if (!title) { document.getElementById('m-title').focus(); return; }
+  const data = { id: editingId || uid(), title, cat:document.getElementById('m-cat').value, format:document.getElementById('m-format').value, message:document.getElementById('m-message').value, structure:document.getElementById('m-structure').value, caption:document.getElementById('m-caption').value, shoot:document.getElementById('m-shoot').value, status:document.getElementById('m-status').value, date:document.getElementById('m-date').value || today(), memo:document.getElementById('m-memo').value };
+  if (editingId) { const idx = ideas.findIndex(i => i.id === editingId); if (idx !== -1) ideas[idx] = data; }
+  else ideas.push(data);
+  save(ideas); closeModal(); render();
+}
+
+const STATUS_CYCLE = ['idea','plan','making','done','posted'];
+function cycleStatus(id) {
+  const idea = ideas.find(i => i.id === id);
+  if (!idea) return;
+  idea.status = STATUS_CYCLE[(STATUS_CYCLE.indexOf(idea.status) + 1) % STATUS_CYCLE.length];
+  save(ideas); render();
+}
+
+function deleteCard(id) {
+  if (!confirm('이 아이디어를 삭제할까요?')) return;
+  ideas = ideas.filter(i => i.id !== id); save(ideas); render();
+}
+
+function exportData() {
+  const lines = ['MOOMUA 콘텐츠 기획판', '='.repeat(40), ''];
+  ideas.forEach((idea, i) => {
+    lines.push(`[${i+1}] ${idea.title}`);
+    lines.push(`카테고리: ${CAT_LABEL[idea.cat]} | 포맷: ${idea.format} | 상태: ${STATUS_LABEL[idea.status]}`);
+    if (idea.date) lines.push(`발행 목표: ${idea.date}`);
+    if (idea.message) lines.push(`핵심 메시지: ${idea.message}`);
+    if (idea.structure) lines.push(`구성: ${idea.structure}`);
+    if (idea.caption) lines.push(`캡션: ${idea.caption}`);
+    if (idea.memo) lines.push(`메모: ${idea.memo}`);
+    lines.push('');
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `MOOMUA_콘텐츠기획_${today()}.txt`; a.click();
+}
+
+render();
+</script>
+</body>
+</html>
