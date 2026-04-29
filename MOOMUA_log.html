@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MOOMUA 수업일지">
+<title>MOOMUA — 수업일지</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #F7F3EE; --beige: #EDE8E1; --warm: #E8DDD0;
+  --sage: #8FA888; --sage-light: #EAF0E8; --sage-mid: #5C7A58; --sage-dark: #3A5436;
+  --text: #1A1918; --text2: #5C5A55; --text3: #9C9A93;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.13);
+  --white: #FFFFFF; --r: 12px; --r-sm: 8px;
+  --red: #C0392B; --red-light: #FDEAEA;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--cream); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+/* 상단 바 */
+.topbar {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(247,243,238,0.96); backdrop-filter: blur(14px);
+  border-bottom: 0.5px solid var(--border2);
+  padding: 0 1.5rem; height: 52px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.tb-brand { font-family: 'Noto Serif KR', serif; font-size: 13px; letter-spacing: 0.16em; color: var(--sage-dark); white-space: nowrap; }
+.tb-right { display: flex; gap: 8px; align-items: center; }
+.tb-btn { font-size: 12px; padding: 6px 14px; border-radius: 99px; border: none; cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.15s; white-space: nowrap; }
+.tb-btn-primary { background: var(--sage-mid); color: var(--white); }
+.tb-btn-primary:hover { background: var(--sage-dark); }
+.tb-btn-ghost { background: transparent; color: var(--text2); border: 0.5px solid var(--border2); }
+.tb-btn-ghost:hover { background: var(--beige); }
+
+/* 레이아웃 */
+.layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 52px); }
+
+/* 사이드바 */
+.sidebar { background: var(--beige); border-right: 0.5px solid var(--border2); padding: 1.25rem 0.875rem; position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto; }
+.sb-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin-bottom: 0.5rem; padding: 0 6px; }
+.sb-section { margin-bottom: 1.25rem; }
+.sb-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: var(--r-sm); font-size: 13px; color: var(--text2); cursor: pointer; transition: all 0.12s; border: none; background: none; font-family: inherit; width: 100%; text-align: left; }
+.sb-item:hover { background: var(--warm); color: var(--text); }
+.sb-item.active { background: var(--sage-mid); color: var(--white); font-weight: 500; }
+.sb-cnt { margin-left: auto; font-size: 10px; opacity: 0.6; }
+.sb-stat { background: var(--white); border-radius: var(--r-sm); padding: 10px 12px; margin-bottom: 6px; border: 0.5px solid var(--border); }
+.ss-num { font-size: 20px; font-weight: 500; color: var(--text); }
+.ss-label { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+/* 메인 */
+.main { padding: 1.5rem; overflow-y: auto; }
+
+/* 회원 관리 바 */
+.member-bar { background: var(--white); border: 0.5px solid var(--border2); border-radius: var(--r); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; gap: 10px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.mb-input { flex: 1; font-size: 13px; padding: 8px 12px; border: 0.5px solid var(--border2); border-radius: var(--r-sm); background: var(--cream); color: var(--text); font-family: inherit; outline: none; }
+.mb-input:focus { border-color: var(--sage-mid); background: var(--white); }
+
+/* 일지 목록 */
+.logs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.log-card { background: var(--white); border: 0.5px solid var(--border); border-radius: var(--r); overflow: hidden; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; }
+.log-card:hover { border-color: var(--border2); box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+.lc-top { padding: 1rem; }
+.lc-member { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.lc-date { font-size: 11px; color: var(--text3); margin-bottom: 8px; }
+.lc-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.lc-tag { font-size: 10px; padding: 2px 7px; border-radius: 99px; background: var(--sage-light); color: var(--sage-dark); border: 0.5px solid var(--sage); }
+.lc-memo { font-size: 11px; color: var(--text2); margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lc-bottom { padding: 8px 1rem; border-top: 0.5px solid var(--border); background: var(--cream); display: flex; align-items: center; justify-content: space-between; }
+.lc-session { font-size: 10px; color: var(--text3); }
+.lc-actions { display: flex; gap: 4px; }
+.lc-btn { font-size: 10px; padding: 2px 7px; border-radius: var(--r-sm); border: 0.5px solid var(--border2); background: var(--white); color: var(--text2); cursor: pointer; font-family: inherit; }
+.lc-btn:hover { background: var(--beige); }
+.lc-btn.del:hover { background: var(--red-light); color: var(--red); }
+
+/* 모달 */
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px); align-items: flex-start; justify-content: center; padding: 1rem; overflow-y: auto; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--white); border-radius: var(--r); width: 100%; max-width: 620px; margin: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.modal-header { padding: 1.25rem 1.5rem 1rem; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--white); z-index: 1; border-radius: var(--r) var(--r) 0 0; }
+.modal-title { font-family: 'Noto Serif KR', serif; font-size: 15px; font-weight: 500; color: var(--sage-dark); }
+.modal-close { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--beige); cursor: pointer; font-size: 14px; color: var(--text2); }
+.modal-close:hover { background: var(--warm); }
+.modal-body { padding: 1.25rem 1.5rem; }
+
+/* 섹션 */
+.section { margin-bottom: 1.5rem; }
+.section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sage-mid); margin-bottom: 0.75rem; padding-bottom: 6px; border-bottom: 0.5px solid var(--border); }
+.field { margin-bottom: 0.75rem; }
+.field-label { font-size: 11px; font-weight: 500; color: var(--text3); margin-bottom: 4px; }
+.field-input, .field-select, .field-textarea { width: 100%; font-size: 13px; padding: 8px 11px; border: 0.5px solid var(--border2); border-radius: var(--r-sm); background: var(--cream); color: var(--text); font-family: inherit; outline: none; transition: border-color 0.15s; }
+.field-input:focus, .field-select:focus, .field-textarea:focus { border-color: var(--sage-mid); background: var(--white); }
+.field-textarea { min-height: 70px; resize: vertical; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+/* 체크박스 그룹 */
+.check-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.check-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); cursor: pointer; padding: 4px 10px; border-radius: 99px; border: 0.5px solid var(--border2); background: var(--white); transition: all 0.12s; user-select: none; }
+.check-item:hover { border-color: var(--sage); background: var(--sage-light); }
+.check-item.checked { background: var(--sage-light); border-color: var(--sage-mid); color: var(--sage-dark); font-weight: 500; }
+.check-item input { display: none; }
+
+/* 컨디션 별점 */
+.condition-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.condition-label { font-size: 12px; color: var(--text2); width: 80px; flex-shrink: 0; }
+.condition-stars { display: flex; gap: 4px; }
+.star { font-size: 18px; cursor: pointer; opacity: 0.3; transition: opacity 0.1s; }
+.star.on { opacity: 1; }
+
+/* 모달 하단 */
+.modal-actions { padding: 1rem 1.5rem; border-top: 0.5px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.modal-btn { font-size: 13px; padding: 8px 18px; border-radius: 99px; border: none; cursor: pointer; font-family: inherit; font-weight: 500; }
+.modal-btn-primary { background: var(--sage-mid); color: var(--white); }
+.modal-btn-primary:hover { background: var(--sage-dark); }
+.modal-btn-ghost { background: var(--beige); color: var(--text2); }
+
+/* 빈 상태 */
+.empty-state { text-align: center; padding: 4rem 2rem; color: var(--text3); grid-column: 1/-1; }
+.empty-icon { font-size: 36px; margin-bottom: 1rem; }
+.empty-title { font-size: 15px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+.empty-desc { font-size: 13px; line-height: 1.7; }
+
+/* 반응형 */
+@media (max-width: 640px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .logs-grid { grid-template-columns: 1fr; }
+  .grid2 { grid-template-columns: 1fr; }
+  .grid3 { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-brand">MOOMUA · 수업일지</div>
+  <div class="tb-right">
+    <span style="font-size:12px;color:var(--text3);" id="total-count">0건</span>
+    <button class="tb-btn tb-btn-ghost" onclick="exportData()">내보내기</button>
+    <button class="tb-btn tb-btn-primary" onclick="openModal()">+ 새 일지</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- 사이드바 -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">현황</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div class="sb-stat"><div class="ss-num" id="stat-total">0</div><div class="ss-label">전체</div></div>
+        <div class="sb-stat"><div class="ss-num" id="stat-members">0</div><div class="ss-label">회원수</div></div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">회원별</div>
+      <button class="sb-item active" onclick="filterMember('all',this)">📋 전체 <span class="sb-cnt" id="cnt-all">0</span></button>
+      <div id="member-list"></div>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main">
+    <div class="member-bar">
+      <input class="mb-input" id="search-input" placeholder="🔍 회원명 또는 내용으로 검색..." oninput="render()">
+    </div>
+    <div class="logs-grid" id="logs-container">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">🌿</div>
+        <div class="empty-title">아직 수업 일지가 없어요</div>
+        <div class="empty-desc">"+ 새 일지"로 첫 수업을 기록해보세요</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 모달 -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title-label">새 수업 일지</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="modal-id">
+
+      <!-- 기본 정보 -->
+      <div class="section">
+        <div class="section-title">📋 기본 정보</div>
+        <div class="grid2">
+          <div class="field"><div class="field-label">회원명 *</div><input class="field-input" id="m-member" placeholder="회원 이름"></div>
+          <div class="field"><div class="field-label">수업 회차</div><input class="field-input" id="m-session" type="number" placeholder="예: 12"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><div class="field-label">날짜</div><input class="field-input" id="m-date" type="date"></div>
+          <div class="field"><div class="field-label">잔여 횟수</div><input class="field-input" id="m-remain" type="number" placeholder="예: 8"></div>
+        </div>
+      </div>
+
+      <!-- 오늘의 컨디션 -->
+      <div class="section">
+        <div class="section-title">🌡️ 오늘의 컨디션</div>
+        <div class="condition-row"><span class="condition-label">전반 컨디션</span><div class="condition-stars" id="stars-condition"></div></div>
+        <div class="condition-row"><span class="condition-label">수면 상태</span><div class="condition-stars" id="stars-sleep"></div></div>
+        <div class="condition-row"><span class="condition-label">스트레스</span><div class="condition-stars" id="stars-stress"></div></div>
+        <div class="field" style="margin-top:8px;"><div class="field-label">불편한 부위</div><input class="field-input" id="m-pain" placeholder="예: 오른쪽 어깨, 허리"></div>
+        <div class="field"><div class="field-label">생활 패턴</div>
+          <div class="check-group" id="m-lifestyle">
+            <label class="check-item"><input type="checkbox" value="많이 앉아있었음">많이 앉아있었음</label>
+            <label class="check-item"><input type="checkbox" value="많이 움직였음">많이 움직였음</label>
+            <label class="check-item"><input type="checkbox" value="운동 병행함">운동 병행함</label>
+            <label class="check-item"><input type="checkbox" value="피로 누적">피로 누적</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 1~2 -->
+      <div class="section">
+        <div class="section-title">🌬️ PHASE 1~2 · 연결 & 준비</div>
+        <div class="field"><div class="field-label">호흡 패턴</div>
+          <div class="check-group" id="m-breath">
+            <label class="check-item"><input type="checkbox" value="흉식호흡">흉식호흡</label>
+            <label class="check-item"><input type="checkbox" value="역호흡">역호흡</label>
+            <label class="check-item"><input type="checkbox" value="복식호흡(정상)">복식(정상)</label>
+            <label class="check-item"><input type="checkbox" value="불규칙">불규칙</label>
+          </div>
+        </div>
+        <div class="field"><div class="field-label">심부근 인지</div>
+          <div class="check-group" id="m-deepmuscle">
+            <label class="check-item"><input type="checkbox" value="복횡근">복횡근</label>
+            <label class="check-item"><input type="checkbox" value="골반기저근">골반기저근</label>
+            <label class="check-item"><input type="checkbox" value="다열근">다열근</label>
+            <label class="check-item"><input type="checkbox" value="연결 어려움">연결 어려움</label>
+          </div>
+        </div>
+        <div class="field"><div class="field-label">이완 부위 & 강사 관찰</div><textarea class="field-textarea" id="m-phase12" placeholder="이완 부위, 관찰 사항 메모"></textarea></div>
+      </div>
+
+      <!-- PHASE 3 -->
+      <div class="section">
+        <div class="section-title">💪 PHASE 3 · 오늘의 수업</div>
+        <div class="field"><div class="field-label">오늘의 주제</div>
+          <div class="check-group" id="m-topic">
+            <label class="check-item"><input type="checkbox" value="흉추 가동성">흉추 가동성</label>
+            <label class="check-item"><input type="checkbox" value="고관절 패턴">고관절 패턴</label>
+            <label class="check-item"><input type="checkbox" value="견갑 안정화">견갑 안정화</label>
+            <label class="check-item"><input type="checkbox" value="척추 분절">척추 분절</label>
+            <label class="check-item"><input type="checkbox" value="코어 활성화">코어 활성화</label>
+            <label class="check-item"><input type="checkbox" value="호흡 패턴">호흡 패턴</label>
+            <label class="check-item"><input type="checkbox" value="골반 정렬">골반 정렬</label>
+            <label class="check-item"><input type="checkbox" value="발·무릎 정렬">발·무릎 정렬</label>
+          </div>
+        </div>
+        <div class="field"><div class="field-label">사용 기구</div>
+          <div class="check-group" id="m-equipment">
+            <label class="check-item"><input type="checkbox" value="리포머">리포머</label>
+            <label class="check-item"><input type="checkbox" value="캐딜락">캐딜락</label>
+            <label class="check-item"><input type="checkbox" value="체어">체어</label>
+            <label class="check-item"><input type="checkbox" value="배럴">배럴</label>
+            <label class="check-item"><input type="checkbox" value="매트">매트</label>
+            <label class="check-item"><input type="checkbox" value="소도구">소도구</label>
+          </div>
+        </div>
+        <div class="field"><div class="field-label">주요 운동 목록</div><textarea class="field-textarea" id="m-exercises" placeholder="오늘 진행한 운동들을 적어주세요"></textarea></div>
+      </div>
+
+      <!-- 강사 관찰 -->
+      <div class="section">
+        <div class="section-title">🔍 강사 관찰 & 분석</div>
+        <div class="field"><div class="field-label">보상패턴 관찰</div><textarea class="field-textarea" id="m-compensation" placeholder="관찰된 보상패턴"></textarea></div>
+        <div class="grid2">
+          <div class="field"><div class="field-label">개선된 점</div><textarea class="field-textarea" id="m-improved" placeholder="이전 대비 좋아진 점" style="min-height:60px;"></textarea></div>
+          <div class="field"><div class="field-label">주의 관찰 부위</div><textarea class="field-textarea" id="m-watch" placeholder="다음 수업에서 주의할 부위" style="min-height:60px;"></textarea></div>
+        </div>
+      </div>
+
+      <!-- PHASE 4~5 -->
+      <div class="section">
+        <div class="section-title">🌿 PHASE 4~5 · 통합 & 씨앗</div>
+        <div class="field"><div class="field-label">마무리 호흡 비교</div>
+          <div class="check-group" id="m-breathresult">
+            <label class="check-item"><input type="checkbox" value="시작보다 좋아짐">시작보다 좋아짐</label>
+            <label class="check-item"><input type="checkbox" value="변화 없음">변화 없음</label>
+            <label class="check-item"><input type="checkbox" value="오히려 피로함">오히려 피로함</label>
+            <label class="check-item"><input type="checkbox" value="변화 인지함">변화 인지함</label>
+          </div>
+        </div>
+        <div class="field"><div class="field-label">회원님 반응</div>
+          <div class="check-group" id="m-reaction">
+            <label class="check-item"><input type="checkbox" value="긍정적">긍정적</label>
+            <label class="check-item"><input type="checkbox" value="힘들어함">힘들어함</label>
+            <label class="check-item"><input type="checkbox" value="변화를 느낌">변화를 느낌</label>
+            <label class="check-item"><input type="checkbox" value="무반응">무반응</label>
+            <label class="check-item"><input type="checkbox" value="질문 있었음">질문 있었음</label>
+          </div>
+        </div>
+        <div class="field"><div class="field-label">오늘의 씨앗 (일상 숙제)</div><input class="field-input" id="m-seed" placeholder="예: 저녁에 옆구리 호흡 3번만"></div>
+      </div>
+
+      <!-- 다음 수업 -->
+      <div class="section">
+        <div class="section-title">📌 다음 수업 방향</div>
+        <div class="field"><div class="field-label">다음 주제</div><input class="field-input" id="m-next" placeholder="다음 수업에서 다룰 내용"></div>
+        <div class="field"><div class="field-label">확인할 사항 & 특이사항</div><textarea class="field-textarea" id="m-memo" placeholder="병원, 타운동, 특이사항 등 자유 메모"></textarea></div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-ghost" onclick="closeModal()">취소</button>
+      <button class="modal-btn modal-btn-primary" onclick="saveLog()">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'moomua_logs_v1';
+function load() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; } }
+function save(d) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch {} }
+
+let logs = load();
+let filterMem = 'all';
+let editingId = null;
+
+// 별점 상태
+const stars = { condition: 0, sleep: 0, stress: 0 };
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function today() { return new Date().toISOString().slice(0, 10); }
+function fmtDate(d) { if (!d) return ''; const [y, m, dd] = d.split('-'); return `${y}.${m}.${dd}`; }
+
+// 별점 초기화
+function initStars(id, key) {
+  const container = document.getElementById(id);
+  container.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const s = document.createElement('span');
+    s.className = 'star' + (i <= stars[key] ? ' on' : '');
+    s.textContent = '⭐';
+    s.onclick = () => { stars[key] = i; initStars(id, key); };
+    container.appendChild(s);
+  }
+}
+
+function initAllStars(condVal = 0, sleepVal = 0, stressVal = 0) {
+  stars.condition = condVal;
+  stars.sleep = sleepVal;
+  stars.stress = stressVal;
+  initStars('stars-condition', 'condition');
+  initStars('stars-sleep', 'sleep');
+  initStars('stars-stress', 'stress');
+}
+
+// 체크박스 초기화
+function initChecks(groupId, values = []) {
+  const items = document.querySelectorAll(`#${groupId} .check-item`);
+  items.forEach(item => {
+    const cb = item.querySelector('input');
+    cb.checked = values.includes(cb.value);
+    item.classList.toggle('checked', cb.checked);
+    item.onclick = () => {
+      cb.checked = !cb.checked;
+      item.classList.toggle('checked', cb.checked);
+    };
+  });
+}
+
+function getChecked(groupId) {
+  return Array.from(document.querySelectorAll(`#${groupId} .check-item.checked input`)).map(cb => cb.value);
+}
+
+// 렌더링
+function render() {
+  const search = document.getElementById('search-input').value.trim().toLowerCase();
+  let filtered = logs.slice();
+  if (filterMem !== 'all') filtered = filtered.filter(l => l.member === filterMem);
+  if (search) filtered = filtered.filter(l =>
+    l.member.toLowerCase().includes(search) ||
+    (l.memo || '').toLowerCase().includes(search) ||
+    (l.exercises || '').toLowerCase().includes(search)
+  );
+
+  const container = document.getElementById('logs-container');
+  container.querySelectorAll('.log-card').forEach(e => e.remove());
+  const empty = document.getElementById('empty-state');
+
+  if (filtered.length === 0) { empty.style.display = 'block'; }
+  else {
+    empty.style.display = 'none';
+    filtered.slice().reverse().forEach(log => container.appendChild(makeCard(log)));
+  }
+
+  updateCounts();
+  updateMemberList();
+}
+
+function makeCard(log) {
+  const div = document.createElement('div');
+  div.className = 'log-card';
+  const topics = (log.topic || []).slice(0, 3).map(t => `<span class="lc-tag">${t}</span>`).join('');
+  div.innerHTML = `
+    <div class="lc-top" onclick="openModal('${log.id}')">
+      <div class="lc-member">${escHtml(log.member)}</div>
+      <div class="lc-date">${fmtDate(log.date)} · ${log.session ? log.session + '회차' : ''} ${log.remain ? '· 잔여 ' + log.remain + '회' : ''}</div>
+      <div class="lc-tags">${topics}</div>
+      ${log.seed ? `<div class="lc-memo">💡 ${escHtml(log.seed)}</div>` : ''}
+      ${log.next ? `<div class="lc-memo">📌 ${escHtml(log.next)}</div>` : ''}
+    </div>
+    <div class="lc-bottom">
+      <span class="lc-session">${'⭐'.repeat(log.conditionStar || 0) || '컨디션 미기록'}</span>
+      <div class="lc-actions">
+        <button class="lc-btn" onclick="event.stopPropagation();openModal('${log.id}')">수정</button>
+        <button class="lc-btn del" onclick="event.stopPropagation();deleteLog('${log.id}')">삭제</button>
+      </div>
+    </div>`;
+  return div;
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function updateCounts() {
+  const members = [...new Set(logs.map(l => l.member))];
+  document.getElementById('total-count').textContent = logs.length + '건';
+  document.getElementById('stat-total').textContent = logs.length;
+  document.getElementById('stat-members').textContent = members.length;
+  document.getElementById('cnt-all').textContent = logs.length;
+}
+
+function updateMemberList() {
+  const members = [...new Set(logs.map(l => l.member))];
+  const container = document.getElementById('member-list');
+  container.innerHTML = '';
+  members.forEach(m => {
+    const cnt = logs.filter(l => l.member === m).length;
+    const btn = document.createElement('button');
+    btn.className = 'sb-item' + (filterMem === m ? ' active' : '');
+    btn.innerHTML = `👤 ${m} <span class="sb-cnt">${cnt}</span>`;
+    btn.onclick = () => filterMember(m, btn);
+    container.appendChild(btn);
+  });
+}
+
+function filterMember(mem, btn) {
+  filterMem = mem;
+  document.querySelectorAll('.sidebar .sb-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+// 모달
+function openModal(id) {
+  editingId = id || null;
+  document.getElementById('modal-title-label').textContent = id ? '수업 일지 수정' : '새 수업 일지';
+
+  if (id) {
+    const log = logs.find(l => l.id === id);
+    if (!log) return;
+    document.getElementById('m-member').value = log.member || '';
+    document.getElementById('m-session').value = log.session || '';
+    document.getElementById('m-date').value = log.date || '';
+    document.getElementById('m-remain').value = log.remain || '';
+    document.getElementById('m-pain').value = log.pain || '';
+    document.getElementById('m-phase12').value = log.phase12 || '';
+    document.getElementById('m-exercises').value = log.exercises || '';
+    document.getElementById('m-compensation').value = log.compensation || '';
+    document.getElementById('m-improved').value = log.improved || '';
+    document.getElementById('m-watch').value = log.watch || '';
+    document.getElementById('m-seed').value = log.seed || '';
+    document.getElementById('m-next').value = log.next || '';
+    document.getElementById('m-memo').value = log.memo || '';
+    initAllStars(log.conditionStar || 0, log.sleepStar || 0, log.stressStar || 0);
+    initChecks('m-lifestyle', log.lifestyle || []);
+    initChecks('m-breath', log.breath || []);
+    initChecks('m-deepmuscle', log.deepmuscle || []);
+    initChecks('m-topic', log.topic || []);
+    initChecks('m-equipment', log.equipment || []);
+    initChecks('m-breathresult', log.breathresult || []);
+    initChecks('m-reaction', log.reaction || []);
+  } else {
+    ['m-member','m-session','m-date','m-remain','m-pain','m-phase12','m-exercises','m-compensation','m-improved','m-watch','m-seed','m-next','m-memo'].forEach(id => { document.getElementById(id).value = id === 'm-date' ? today() : ''; });
+    initAllStars();
+    ['m-lifestyle','m-breath','m-deepmuscle','m-topic','m-equipment','m-breathresult','m-reaction'].forEach(id => initChecks(id));
+  }
+
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('m-member').focus(), 100);
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); editingId = null; }
+
+function saveLog() {
+  const member = document.getElementById('m-member').value.trim();
+  if (!member) { document.getElementById('m-member').focus(); return; }
+
+  const data = {
+    id: editingId || uid(),
+    member,
+    session: document.getElementById('m-session').value,
+    date: document.getElementById('m-date').value || today(),
+    remain: document.getElementById('m-remain').value,
+    conditionStar: stars.condition,
+    sleepStar: stars.sleep,
+    stressStar: stars.stress,
+    pain: document.getElementById('m-pain').value,
+    lifestyle: getChecked('m-lifestyle'),
+    breath: getChecked('m-breath'),
+    deepmuscle: getChecked('m-deepmuscle'),
+    phase12: document.getElementById('m-phase12').value,
+    topic: getChecked('m-topic'),
+    equipment: getChecked('m-equipment'),
+    exercises: document.getElementById('m-exercises').value,
+    compensation: document.getElementById('m-compensation').value,
+    improved: document.getElementById('m-improved').value,
+    watch: document.getElementById('m-watch').value,
+    breathresult: getChecked('m-breathresult'),
+    reaction: getChecked('m-reaction'),
+    seed: document.getElementById('m-seed').value,
+    next: document.getElementById('m-next').value,
+    memo: document.getElementById('m-memo').value,
+  };
+
+  if (editingId) { const idx = logs.findIndex(l => l.id === editingId); if (idx !== -1) logs[idx] = data; }
+  else logs.push(data);
+
+  save(logs); closeModal(); render();
+}
+
+function deleteLog(id) {
+  if (!confirm('이 수업 일지를 삭제할까요?')) return;
+  logs = logs.filter(l => l.id !== id); save(logs); render();
+}
+
+function exportData() {
+  const lines = ['MOOMUA 수업일지 내보내기', '='.repeat(40), ''];
+  logs.forEach((log, i) => {
+    lines.push(`[${i+1}] ${log.member} · ${log.date} · ${log.session || '?'}회차`);
+    if (log.topic?.length) lines.push(`주제: ${log.topic.join(', ')}`);
+    if (log.exercises) lines.push(`운동: ${log.exercises}`);
+    if (log.compensation) lines.push(`보상패턴: ${log.compensation}`);
+    if (log.seed) lines.push(`씨앗: ${log.seed}`);
+    if (log.next) lines.push(`다음: ${log.next}`);
+    if (log.memo) lines.push(`메모: ${log.memo}`);
+    lines.push('');
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `MOOMUA_수업일지_${today()}.txt`; a.click();
+}
+
+// 초기화
+initAllStars();
+['m-lifestyle','m-breath','m-deepmuscle','m-topic','m-equipment','m-breathresult','m-reaction'].forEach(id => initChecks(id));
+render();
+</script>
+</body>
+</html>
